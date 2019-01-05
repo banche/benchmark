@@ -42,84 +42,53 @@ void BM_Insert_Sequential(benchmark::State& state)
     const int64_t value = 42;
     for(auto _ : state)
     {
-        AdapterT::insert(c, i++, value);
-    }
-}
-
-template <typename K, typename V, template<typename ...> typename H>
-static void BM_Insert_Sequential_Reserve(benchmark::State& state)
-{
-    using AdapterT = Adapter<K, V, H>;
-    using Type = typename AdapterT::C;
-    Type c;
-    c.reserve(1000000);
-    int64_t i = 0;
-    const int64_t value = 42;
-    for(auto _ : state)
-    {
-        AdapterT::insert(c , i++, value);
+        state.PauseTiming();
+        c.clear();
+        c.reserve(state.range(0));
+        state.ResumeTiming();
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            AdapterT::insert(c, i++, value);
+        }
     }
 }
 
 template <typename K, typename V, template<typename ...> typename H>
 static void BM_Insert_Random(benchmark::State& state) {
-    std::vector<int> keys;
-    constexpr int maxIdx = 1 << 23;
-    keys.reserve(maxIdx);
-    for(int i = 0; i < maxIdx; ++i)
-    {
-        keys.push_back(i);
-    }
-    std::shuffle(keys.begin(), keys.end(), generator);
-
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
     int i = 0;
     const int64_t value = 42;
-    for(auto _ : state)
-    {
-        auto key = keys[i];
-        AdapterT::insert(c, key, value);
-        i = (i+1) % maxIdx;
-    }
-}
-
-template <typename K, typename V, template<typename ...> typename H>
-static void BM_Insert_Random_Reserve(benchmark::State& state) {
     std::vector<int> keys;
-    constexpr int maxIdx = 1 << 23;
-    keys.reserve(maxIdx);
-    for(int i = 0; i < maxIdx; ++i)
-    {
-        keys.push_back(i);
-    }
-    std::shuffle(keys.begin(), keys.end(), generator);
-
-    using AdapterT = Adapter<K, V, H>;
-    using Type = typename AdapterT::C;
-    Type c;
-    c.reserve(maxIdx);
-    int i = 0;
-    const int64_t value = 42;
+    keys.reserve(state.range(0));
     for(auto _ : state)
     {
-        auto key = keys[i];
-        AdapterT::insert(c, key, value);
-        i = (i+1) % maxIdx;
+        state.PauseTiming();
+        keys.clear();
+        for(int i = 0; i < state.range(0); ++i)
+        {
+            keys.push_back(i);
+        }
+        std::shuffle(keys.begin(), keys.end(), generator);
+
+        c.clear();
+        c.reserve(state.range(0));
+        state.ResumeTiming();
+        for (K i = 0; i < state.range(0); ++i)
+        {
+            auto key = keys[i];
+            AdapterT::insert(c, key, value);
+        }
     }
 }
 
 
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, std::unordered_map);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, absl::flat_hash_map);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, std::unordered_map);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, absl::flat_hash_map);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential_Reserve, int64_t, int64_t, std::unordered_map);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential_Reserve, int64_t, int64_t, absl::flat_hash_map);
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, std::unordered_map);
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, absl::flat_hash_map);
-BENCHMARK_TEMPLATE(BM_Insert_Random_Reserve, int64_t, int64_t, std::unordered_map);
-BENCHMARK_TEMPLATE(BM_Insert_Random_Reserve, int64_t, int64_t, absl::flat_hash_map);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
 
 BENCHMARK_MAIN();
