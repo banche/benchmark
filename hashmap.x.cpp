@@ -25,6 +25,8 @@ struct Adapter
     using C = HashMap<Key, Value>;
     template <typename ...Args>
     static auto insert(C& c, KeyType k, ValueType v) { return c.insert({k, v});}
+    static void reserve(C& c, std::size_t size) { c.reserve(size); }
+    static void clear(C& c) { c.clear(); }
 };
 
 // template<typename KeyType, typename ValueType>
@@ -46,8 +48,8 @@ void BM_Insert_Sequential(benchmark::State& state)
     for(auto _ : state)
     {
         state.PauseTiming();
-        c.clear();
-        c.reserve(state.range(0));
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
         state.ResumeTiming();
         for (K i= 0; i < state.range(0); ++i)
         {
@@ -75,8 +77,8 @@ static void BM_Insert_Random(benchmark::State& state) {
         }
         std::shuffle(keys.begin(), keys.end(), generator);
 
-        c.clear();
-        c.reserve(state.range(0));
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
         state.ResumeTiming();
         for (K i = 0; i < state.range(0); ++i)
         {
