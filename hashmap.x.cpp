@@ -25,8 +25,14 @@ struct Adapter
     using C = HashMap<Key, Value>;
     template <typename ...Args>
     static auto insert(C& c, KeyType k, ValueType v) { return c.insert({k, v});}
+
+    template<typename ...Args>
+    static auto erase(C& c, KeyType k) { return c.erase(k); }
+
     static void reserve(C& c, std::size_t size) { c.reserve(size); }
     static void clear(C& c) { c.clear(); }
+
+
 };
 
 template <typename V>
@@ -52,21 +58,12 @@ struct ValueSelector<std::string>
     static auto value() { return "moizouzoumoithisisalongstringreallylong"; }
 };
 
-// template<typename KeyType, typename ValueType>
-// struct Adapter<KeyType, ValueType, std::unordered_map>
-// {
-//     using C = std::unordered_map<KeyType, ValueType>;
-//     template <typename ...Args>
-//     static auto insert(C& c, KeyType k, ValueType v) { return c.insert({k, v});}
-// };
-
 template <typename K, typename V, template<typename ...> typename H>
 void BM_Insert_Sequential(benchmark::State& state)
 {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
-    int64_t i = 0;
     const auto value = ValueSelector<V>::value();
     for(auto _ : state)
     {
@@ -110,6 +107,29 @@ static void BM_Insert_Random(benchmark::State& state) {
     }
 }
 
+template <typename K, typename V, template<typename ...> typename H>
+static void BM_Erase_Sequential(benchmark::State& state) {
+    using AdapterT = Adapter<K, V, H>;
+    using Type = typename AdapterT::C;
+    Type c;
+    auto value = ValueSelector<V>::value();
+    for(auto _ : state)
+    {
+        state.PauseTiming();
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            AdapterT::insert(c, i++, value);
+        }
+        state.ResumeTiming();
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            AdapterT::erase(c, i++);
+        }
+    }
+}
+
 
 BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
@@ -125,5 +145,10 @@ BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, boost::unordered_map)->Ar
 BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
 BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
 BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
+
+BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+
 
 BENCHMARK_MAIN();
