@@ -46,9 +46,10 @@ void BM_Insert_Sequential(benchmark::State& state)
     }
 }
 
+template <typename K, typename V, template<typename ...> typename H>
 static void BM_Insert_Sequential_Reserve(benchmark::State& state)
 {
-    using AdapterT = Adapter<int64_t, int64_t, std::unordered_map>;
+    using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
     c.reserve(1000000);
@@ -60,6 +61,7 @@ static void BM_Insert_Sequential_Reserve(benchmark::State& state)
     }
 }
 
+template <typename K, typename V, template<typename ...> typename H>
 static void BM_Insert_Random(benchmark::State& state) {
     std::vector<int> keys;
     constexpr int maxIdx = 1 << 23;
@@ -70,7 +72,7 @@ static void BM_Insert_Random(benchmark::State& state) {
     }
     std::shuffle(keys.begin(), keys.end(), generator);
 
-    using AdapterT = Adapter<int64_t, int64_t, std::unordered_map>;
+    using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
     int i = 0;
@@ -83,6 +85,7 @@ static void BM_Insert_Random(benchmark::State& state) {
     }
 }
 
+template <typename K, typename V, template<typename ...> typename H>
 static void BM_Insert_Random_Reserve(benchmark::State& state) {
     std::vector<int> keys;
     constexpr int maxIdx = 1 << 23;
@@ -93,7 +96,7 @@ static void BM_Insert_Random_Reserve(benchmark::State& state) {
     }
     std::shuffle(keys.begin(), keys.end(), generator);
 
-    using AdapterT = Adapter<int64_t, int64_t, std::unordered_map>;
+    using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
     c.reserve(maxIdx);
@@ -112,8 +115,11 @@ BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, std::unordered_map);
 BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, absl::flat_hash_map);
 BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, std::unordered_map);
 BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, absl::flat_hash_map);
-BENCHMARK(BM_Insert_Sequential_Reserve);
-BENCHMARK(BM_Insert_Random);
-BENCHMARK(BM_Insert_Random_Reserve);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential_Reserve, int64_t, int64_t, std::unordered_map);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential_Reserve, int64_t, int64_t, absl::flat_hash_map);
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, std::unordered_map);
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, absl::flat_hash_map);
+BENCHMARK_TEMPLATE(BM_Insert_Random_Reserve, int64_t, int64_t, std::unordered_map);
+BENCHMARK_TEMPLATE(BM_Insert_Random_Reserve, int64_t, int64_t, absl::flat_hash_map);
 
 BENCHMARK_MAIN();
