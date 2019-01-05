@@ -29,6 +29,29 @@ struct Adapter
     static void clear(C& c) { c.clear(); }
 };
 
+template <typename V>
+struct ValueSelector
+{
+};
+
+template<>
+struct ValueSelector<int64_t>
+{
+    static int64_t value() { return 42; }
+};
+
+template<>
+struct ValueSelector<int32_t>
+{
+    static auto value() { return 42; }
+};
+
+template<>
+struct ValueSelector<std::string>
+{
+    static auto value() { return "moizouzoumoithisisalongstringreallylong"; }
+};
+
 // template<typename KeyType, typename ValueType>
 // struct Adapter<KeyType, ValueType, std::unordered_map>
 // {
@@ -44,7 +67,7 @@ void BM_Insert_Sequential(benchmark::State& state)
     using Type = typename AdapterT::C;
     Type c;
     int64_t i = 0;
-    const int64_t value = 42;
+    const auto value = ValueSelector<V>::value();
     for(auto _ : state)
     {
         state.PauseTiming();
@@ -63,15 +86,14 @@ static void BM_Insert_Random(benchmark::State& state) {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
-    int i = 0;
-    const int64_t value = 42;
-    std::vector<int> keys;
+    auto value = ValueSelector<V>::value();
+    std::vector<K> keys;
     keys.reserve(state.range(0));
     for(auto _ : state)
     {
         state.PauseTiming();
         keys.clear();
-        for(int i = 0; i < state.range(0); ++i)
+        for(K i = 0; i < state.range(0); ++i)
         {
             keys.push_back(i);
         }
@@ -100,5 +122,8 @@ BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, boost::unordered_map)
 BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
 BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
 BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
 
 BENCHMARK_MAIN();
