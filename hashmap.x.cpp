@@ -23,16 +23,14 @@ struct Adapter
     using Key = KeyType;
     using Value = ValueType;
     using C = HashMap<Key, Value>;
-    template <typename ...Args>
+
     static auto insert(C& c, KeyType k, ValueType v) { return c.insert({k, v});}
-
-    template<typename ...Args>
     static auto erase(C& c, KeyType k) { return c.erase(k); }
-
+    static auto find(const C& c, KeyType k) { return c.find(k); }
     static void reserve(C& c, std::size_t size) { c.reserve(size); }
     static void clear(C& c) { c.clear(); }
-
-
+    static auto begin(C& c) { return c.begin(); }
+    static auto end(C& c) { return c.end(); }
 };
 
 template <typename V>
