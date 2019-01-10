@@ -197,6 +197,7 @@ static void BM_Find_Sequential(benchmark::State& state)
             error += std::string(" got ") + std::to_string(found);
             throw std::runtime_error(error);
         }
+        state.ResumeTiming();
     }
 }
 
@@ -242,6 +243,95 @@ static void BM_Find_Random(benchmark::State& state)
             error += std::string(" got ") + std::to_string(found);
             throw std::runtime_error(error);
         }
+        state.ResumeTiming();
+    }
+}
+
+enum class Type : uint8_t
+{
+    NEW,
+    DELETE
+};
+
+template <typename T>
+struct Action
+{
+    T id;
+    Type type;
+
+    bool operator==(const Action<T>& other) const
+    {
+        return other.id == id and other.type == type;
+    }
+};
+template<typename T>
+using Actions = std::vector<Action<T>>;
+
+template<typename T>
+Actions<T> generateRandomActions(int64_t count)
+{
+    Actions<T> result;
+    result.reserve(2 * count);
+    for(int i = 0; i < count; ++i)
+    {
+        result.push_back(Action<T>{i, Type::NEW});
+    }
+    std::shuffle(result.begin(), result.end(), generator);
+    for(int i = 0; i < count; ++i)
+    {
+        auto it = std::find(result.begin(), result.end(), Action<T>{i, Type::NEW});
+        auto maxRandom = std::distance(it, result.end());
+        if (maxRandom <= 1)
+        {
+            result.push_back(Action<T>{i, Type::DELETE});
+        }
+        else
+        {
+            std::uniform_int_distribution<T> distribution(1, maxRandom);
+            auto insertIt = it + distribution(generator);
+            result.insert(insertIt, Action<T>{i, Type::DELETE});
+        }
+    }
+    return result;
+}
+
+template <typename K, template<typename ...> typename H>
+static void BM_Insert_Erase_Random(benchmark::State& state)
+{
+    using AdapterT = Adapter<K, Action<K>, H>;
+    using CType = typename AdapterT::C;
+    CType c;
+    for(auto _ : state)
+    {
+        state.PauseTiming();
+        auto actions = generateRandomActions<K>(state.range(0));
+
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
+        int64_t inserted = 0;
+        int64_t deleted = 0;
+        state.ResumeTiming();
+        for (auto& action : actions)
+        {
+            //std::cout << "id:" << action.id << " type" << static_cast<int>(action.type) << "\n";
+            if (action.type == Type::NEW)
+            {
+                inserted += AdapterT::insert(c, action.id, action).second;
+            }
+            else if (action.type == Type::DELETE)
+            {
+                deleted += AdapterT::erase(c, action.id);
+            }
+        }
+        state.PauseTiming();
+        if ((inserted != state.range(0)) or (deleted != state.range(0)))
+        {
+            std::string error = std::string("excepted ") + std::to_string(state.range(0));
+            error += std::string(" got ") + std::to_string(inserted);
+            error += std::string(" , ") + std::to_string(deleted);
+            throw std::runtime_error(error);
+        }
+        state.ResumeTiming();
     }
 }
 
@@ -276,6 +366,14 @@ BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, boost::unordered_map)->
 BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int32_t, std::unordered_map)->Arg(1000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int32_t, absl::flat_hash_map)->Arg(1000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int32_t, boost::unordered_map)->Arg(1000);
 
 
 BENCHMARK_MAIN();
