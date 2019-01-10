@@ -73,13 +73,14 @@ void BM_Insert_Sequential(benchmark::State& state)
         state.ResumeTiming();
         for (K i= 0; i < state.range(0); ++i)
         {
-            AdapterT::insert(c, i++, value);
+            AdapterT::insert(c, i, value);
         }
     }
 }
 
 template <typename K, typename V, template<typename ...> typename H>
-static void BM_Insert_Random(benchmark::State& state) {
+static void BM_Insert_Random(benchmark::State& state)
+{
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
@@ -108,7 +109,8 @@ static void BM_Insert_Random(benchmark::State& state) {
 }
 
 template <typename K, typename V, template<typename ...> typename H>
-static void BM_Erase_Sequential(benchmark::State& state) {
+static void BM_Erase_Sequential(benchmark::State& state)
+{
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
     Type c;
@@ -120,12 +122,48 @@ static void BM_Erase_Sequential(benchmark::State& state) {
         AdapterT::reserve(c, state.range(0));
         for (K i= 0; i < state.range(0); ++i)
         {
-            AdapterT::insert(c, i++, value);
+            AdapterT::insert(c, i, value);
         }
         state.ResumeTiming();
         for (K i= 0; i < state.range(0); ++i)
         {
-            AdapterT::erase(c, i++);
+            AdapterT::erase(c, i);
+        }
+    }
+}
+
+template <typename K, typename V, template<typename ...> typename H>
+static void BM_Erase_Random(benchmark::State& state)
+{
+    using AdapterT = Adapter<K, V, H>;
+    using Type = typename AdapterT::C;
+    Type c;
+    auto value = ValueSelector<V>::value();
+    std::vector<K> keys;
+    keys.reserve(state.range(0));
+    for(auto _ : state)
+    {
+        state.PauseTiming();
+        keys.clear();
+        for(K i = 0; i < state.range(0); ++i)
+        {
+            keys.push_back(i);
+        }
+        std::shuffle(keys.begin(), keys.end(), generator);
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            auto key = keys[i];
+            AdapterT::insert(c, key, value);
+        }
+        // shuffle again
+        std::shuffle(keys.begin(), keys.end(), generator);
+        state.ResumeTiming();
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            auto key = keys[i];
+            AdapterT::erase(c, key);
         }
     }
 }
@@ -149,6 +187,10 @@ BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, boost::unordered_map)
 BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+
+BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 
 
 BENCHMARK_MAIN();
