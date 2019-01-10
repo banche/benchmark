@@ -166,6 +166,85 @@ static void BM_Erase_Random(benchmark::State& state)
     }
 }
 
+template <typename K, typename V, template<typename ...> typename H>
+static void BM_Find_Sequential(benchmark::State& state)
+{
+    using AdapterT = Adapter<K, V, H>;
+    using Type = typename AdapterT::C;
+    Type c;
+    auto value = ValueSelector<V>::value();
+
+    for(auto _ : state)
+    {
+        state.PauseTiming();
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            AdapterT::insert(c, i, value);
+        }
+        int64_t found = 0;
+        state.ResumeTiming();
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            auto it = AdapterT::find(c, i);
+            found += (it != AdapterT::end(c));
+        }
+        state.PauseTiming();
+        if (found != state.range(0))
+        {
+            std::string error = std::string("excepted ") + std::to_string(state.range(0));
+            error += std::string(" got ") + std::to_string(found);
+            throw std::runtime_error(error);
+        }
+    }
+}
+
+template <typename K, typename V, template<typename ...> typename H>
+static void BM_Find_Random(benchmark::State& state)
+{
+    using AdapterT = Adapter<K, V, H>;
+    using Type = typename AdapterT::C;
+    Type c;
+    auto value = ValueSelector<V>::value();
+    std::vector<K> keys;
+    keys.reserve(state.range(0));
+    for(auto _ : state)
+    {
+        state.PauseTiming();
+        keys.clear();
+        for(K i = 0; i < state.range(0); ++i)
+        {
+            keys.push_back(i);
+        }
+        std::shuffle(keys.begin(), keys.end(), generator);
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            auto key = keys[i];
+            AdapterT::insert(c, key, value);
+        }
+        // shuffle again
+        std::shuffle(keys.begin(), keys.end(), generator);
+        int64_t found = 0;
+        state.ResumeTiming();
+        for (K i= 0; i < state.range(0); ++i)
+        {
+            auto key = keys[i];
+            auto it = AdapterT::find(c, key);
+            found += (it != AdapterT::end(c));
+        }
+        state.PauseTiming();
+        if (found != state.range(0))
+        {
+            std::string error = std::string("excepted ") + std::to_string(state.range(0));
+            error += std::string(" got ") + std::to_string(found);
+            throw std::runtime_error(error);
+        }
+    }
+}
+
 
 BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
@@ -189,6 +268,14 @@ BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, boost::unordered_map)-
 BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+
+BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+
+BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 
 
 BENCHMARK_MAIN();
