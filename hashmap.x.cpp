@@ -277,9 +277,10 @@ Actions<T> generateRandomActions(int64_t count)
         result.push_back(Action<T>{i, Type::NEW});
     }
     std::shuffle(result.begin(), result.end(), generator);
+    std::uniform_int_distribution<T> distribution(1, count);
     for(int i = 0; i < count; ++i)
     {
-        auto it = std::find(result.begin(), result.end(), Action<T>{i, Type::NEW});
+        auto it = std::find(result.begin() + i, result.end(), Action<T>{i, Type::NEW});
         auto maxRandom = std::distance(it, result.end());
         if (maxRandom <= 1)
         {
@@ -287,8 +288,8 @@ Actions<T> generateRandomActions(int64_t count)
         }
         else
         {
-            std::uniform_int_distribution<T> distribution(1, maxRandom);
-            auto insertIt = it + distribution(generator);
+
+            auto insertIt = it + 1 + (distribution(generator) % maxRandom);
             result.insert(insertIt, Action<T>{i, Type::DELETE});
         }
     }
@@ -366,13 +367,9 @@ BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, std::unordered_map)->Arg(10
 BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
 
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, std::unordered_map)->Arg(1000)->Arg(100000);
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000);
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000);
-
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int32_t, std::unordered_map)->Arg(1000)->Arg(100000);
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int32_t, absl::flat_hash_map)->Arg(1000)->Arg(100000);
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int32_t, boost::unordered_map)->Arg(1000)->Arg(100000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(100000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(100000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(100000);
 
 
 BENCHMARK_MAIN();
