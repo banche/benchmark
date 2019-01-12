@@ -12,6 +12,12 @@ benchmarks right now
 - absl::unordered_map
 - boost::unordered_map
 
+Here is an example taken from the jupyter notebook for the last benchmarks. It measure
+the time it takes to randomly insert and after few other operations (insert and erase)
+erase the element.
+
+![alt text](https://github.com/banche/benchmark/insert_erase.png "Random Insert/Erase performances")
+
 ## TODO
 
 - complete the benchmark list : find, iterate over the container
