@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import json
+import argparse
+from pprint import pprint
+import collections
 
 def parse_benchmark_name(name: str):
     """
@@ -13,12 +16,21 @@ def parse_benchmark_name(name: str):
 
     return base_name, t_params, size
 
+def parse_benchmark_full_name(name: str):
+    """
+    Returns the benchmark full name including the template types.
+    >>> parse_benchmark_full_name('BM_Insert_Random<int64_t, int64_t, std::unordered_map>/1000')
+    'BM_Insert_Random<int64_t, int64_t, std::unordered_map>'
+    """
+    return name[0: name.find('/')]
+
 class Benchmark(object):
     """
     Benchmark class to hold all the information from google benchmark output
     """
     def __init__(self, benchmark_name, iterations, real_time, cpu_time, unit):
         self.name, self.t_params, self.size = parse_benchmark_name(benchmark_name)
+        self.full_name = parse_benchmark_full_name(benchmark_name)
         self.iterations = iterations
         self.real_time = real_time
         self.cpu_time = cpu_time
@@ -49,3 +61,29 @@ class Benchmark(object):
                 dct['time_unit'])
 
 
+
+def parse_benchmark_json(input: dict):
+    bkey = 'benchmarks'
+    benchmarks = collections.defaultdict(list)
+
+    if not bkey in input.keys():
+        raise RuntimeError('Missing benchmarks key!')
+    ib = input[bkey]
+
+    for bench in ib:
+        benchmark = Benchmark.from_json(bench)
+        benchmarks[benchmark.full_name].append(benchmark)
+
+    # TODO parse some of the context information to generate the final report
+    return benchmarks
+
+
+if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser(description='Parse google benchmark output')
+    arg_parser.add_argument('file', help='input filename')
+    args = arg_parser.parse_args()
+
+    with open(args.file, 'r+') as f:
+        data = json.load(f)
+        benchmarks = parse_benchmark_json(data)
+        pprint(benchmarks)
