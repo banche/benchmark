@@ -16,7 +16,7 @@ Here is an example taken from the jupyter notebook for the last benchmarks. It m
 the time it takes to randomly insert and after few other operations (insert and erase)
 erase the element.
 
-![alt text](https://github.com/banche/benchmark/insert_erase.png "Random Insert/Erase performances")
+![example](https://github.com/banche/benchmark/blob/master/insert_erase.png "Random Insert/Erase performances")
 
 ## TODO
 
