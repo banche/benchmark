@@ -336,40 +336,40 @@ static void BM_Insert_Erase_Random(benchmark::State& state)
 }
 
 
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
 
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
 
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
-BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);;
+BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);;
 
-BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
 
-BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
 
-BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
 
-BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(100000)->Arg(1000000);
-BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(100000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
+BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000);
 
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, std::unordered_map)->Arg(1000)->Arg(10000)->Arg(100000);
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(10000)->Arg(100000);
-BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, boost::unordered_map)->Arg(1000)->Arg(10000)->Arg(100000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, std::unordered_map)->Arg(1000)->Arg(5000)->Arg(10000)->Arg(25000)->Arg(50000)->Arg(75000)->Arg(100000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, absl::flat_hash_map)->Arg(1000)->Arg(5000)->Arg(10000)->Arg(25000)->Arg(50000)->Arg(75000)->Arg(100000);
+BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, boost::unordered_map)->Arg(1000)->Arg(5000)->Arg(10000)->Arg(25000)->Arg(50000)->Arg(75000)->Arg(100000);
 
 
 BENCHMARK_MAIN();
