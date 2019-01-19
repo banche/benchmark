@@ -216,6 +216,9 @@ template="""
                     mode: 'index',
                     intersect: false,
                 },
+                legend : {
+                    position : 'right'
+                },
                 hover: {
                     mode: 'nearest',
                     intersect: true
