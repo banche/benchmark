@@ -16,7 +16,13 @@
 static const std::int64_t SEED = 0;
 static std::mt19937_64 generator(SEED);
 
-
+/// Adapter in case hashmap implementation have different interface.
+///
+/// We assume the default implementation follows the interface of std::unordered_map.
+/// If this is not the case, you just need to partially specialize the Adapter.
+///
+/// Usually we are going to create the default implementation of the hashmap without
+/// specifying the hash function to use.
 template <typename KeyType, typename ValueType, template<typename ...> typename HashMap>
 struct Adapter
 {
@@ -33,15 +39,20 @@ struct Adapter
     static auto end(C& c) { return c.end(); }
 };
 
+/// Value selection depending on the typ/tag
+///
+/// Note there is no default implementation, so for each new type/tag this needs to be
+/// specialized
 template <typename V>
 struct ValueSelector
 {
 };
 
+// TODO : use enable_if to specialize this for all integer type at once
 template<>
 struct ValueSelector<int64_t>
 {
-    static int64_t value() { return 42; }
+    static auto value() { return 42; }
 };
 
 template<>
@@ -56,6 +67,7 @@ struct ValueSelector<std::string>
     static auto value() { return "moizouzoumoithisisalongstringreallylong"; }
 };
 
+/// Inserts [0, state.range(0) -1] in sequential order
 template <typename K, typename V, template<typename ...> typename H>
 void BM_Insert_Sequential(benchmark::State& state)
 {
@@ -76,6 +88,7 @@ void BM_Insert_Sequential(benchmark::State& state)
     }
 }
 
+/// Inserts [0, state.range(0) -1] in random order
 template <typename K, typename V, template<typename ...> typename H>
 static void BM_Insert_Random(benchmark::State& state)
 {
@@ -106,6 +119,8 @@ static void BM_Insert_Random(benchmark::State& state)
     }
 }
 
+/// Inserts [0, state.range(0) -1] in sequential order and measure the time
+/// to do the erase inside [0, state.range(0) -1] in a sequential order
 template <typename K, typename V, template<typename ...> typename H>
 static void BM_Erase_Sequential(benchmark::State& state)
 {
@@ -130,6 +145,8 @@ static void BM_Erase_Sequential(benchmark::State& state)
     }
 }
 
+/// Inserts [0, state.range(0) -1] in random order and measure the time
+/// to do the erase inside [0, state.range(0) -1] in a random order (different than insertion)
 template <typename K, typename V, template<typename ...> typename H>
 static void BM_Erase_Random(benchmark::State& state)
 {
@@ -166,6 +183,8 @@ static void BM_Erase_Random(benchmark::State& state)
     }
 }
 
+/// Inserts [0, state.range(0) -1] in sequential order and measure the time
+/// to do the find inside [0, state.range(0) -1] in a sequential order
 template <typename K, typename V, template<typename ...> typename H>
 static void BM_Find_Sequential(benchmark::State& state)
 {
@@ -201,6 +220,8 @@ static void BM_Find_Sequential(benchmark::State& state)
     }
 }
 
+/// Inserts [0, state.range(0) -1] in random order and measure the time
+/// to do the find in [0, state.range(0) -1] in a random order (different from insert)
 template <typename K, typename V, template<typename ...> typename H>
 static void BM_Find_Random(benchmark::State& state)
 {
@@ -313,7 +334,6 @@ static void BM_Insert_Erase_Random(benchmark::State& state)
         state.ResumeTiming();
         for (auto& action : actions)
         {
-            //std::cout << "id:" << action.id << " type" << static_cast<int>(action.type) << "\n";
             if (action.type == Type::NEW)
             {
                 inserted += AdapterT::insert(c, action.id, action).second;
