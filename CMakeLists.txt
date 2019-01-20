@@ -14,7 +14,8 @@ set(BENCHMARKS_SRC
     benchmark/boost_unordered_map.cpp
     benchmark/qt5_hash.cpp
     benchmark/std_unordered_map.cpp
-    benchmark/ska.cpp)
+    benchmark/ska.cpp
+    benchmark/tsl_robin_map.cpp)
 
 add_executable(hashmap hashmap.x.cpp ${BENCHMARKS_SRC})
-target_link_libraries(hashmap benchmark absl::flat_hash_map Qt5::Core)
+target_link_libraries(hashmap benchmark absl::flat_hash_map Qt5::Core tsl::robin_map)
