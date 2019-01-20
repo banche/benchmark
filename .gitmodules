@@ -7,3 +7,6 @@
 [submodule "thirdparties/skarupke"]
 	path = thirdparties/skarupke
 	url = https://github.com/skarupke/flat_hash_map.git
+[submodule "thirdparties/tsl-robin-map"]
+	path = thirdparties/tsl-robin-map
+	url = https://github.com/Tessil/robin-map.git
