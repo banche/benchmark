@@ -13,6 +13,9 @@
 // Boost
 #include <boost/unordered_map.hpp>
 
+// Qt
+#include <QHash>
+
 static const std::int64_t SEED = 0;
 static std::mt19937_64 generator(SEED);
 
@@ -30,8 +33,24 @@ struct Adapter
     using Value = ValueType;
     using C = HashMap<Key, Value>;
 
-    static auto insert(C& c, KeyType k, ValueType v) { return c.insert({k, v});}
+    static auto insert(C& c, KeyType k, ValueType v) { return c.insert({k, v}).second;}
     static auto erase(C& c, KeyType k) { return c.erase(k); }
+    static auto find(const C& c, KeyType k) { return c.find(k); }
+    static void reserve(C& c, std::size_t size) { c.reserve(size); }
+    static void clear(C& c) { c.clear(); }
+    static auto begin(C& c) { return c.begin(); }
+    static auto end(C& c) { return c.end(); }
+};
+
+template<typename KeyType, typename ValueType>
+struct Adapter<KeyType, ValueType, QHash>
+{
+    using Key = KeyType;
+    using Value = ValueType;
+    using C = QHash<Key, Value>;
+
+    static auto insert(C& c, KeyType k, ValueType v) { return c.insert(k, v) != c.end();}
+    static auto erase(C& c, KeyType k) { return c.remove(k); }
     static auto find(const C& c, KeyType k) { return c.find(k); }
     static void reserve(C& c, std::size_t size) { c.reserve(size); }
     static void clear(C& c) { c.clear(); }
@@ -336,7 +355,7 @@ static void BM_Insert_Erase_Random(benchmark::State& state)
         {
             if (action.type == Type::NEW)
             {
-                inserted += AdapterT::insert(c, action.id, action).second;
+                inserted += AdapterT::insert(c, action.id, action);
             }
             else if (action.type == Type::DELETE)
             {
