@@ -1,4 +1,8 @@
 #pragma once
+
+#include<cstdint>
+#include <string>
+
 /// Adapter in case hashmap implementation have different interface.
 ///
 /// We assume the default implementation follows the interface of std::unordered_map.

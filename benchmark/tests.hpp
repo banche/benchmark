@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Adapter.hpp"
+#include "adapter.hpp"
+
+#include <benchmark/benchmark.h>
 
 #include <algorithm>
 #include <random>
