@@ -9,8 +9,11 @@ Lot's of hashmap implementations are available and in proprietary code you
 can often find custom implementations (for the best or worst) `hashmap.x.cpp`
 benchmarks right now
 - std::unordered_map
-- absl::unordered_map
+- [absl::unordered_map](https://abseil.io/)
 - boost::unordered_map
+- QHash
+- [ska::flat_hash_map](https://github.com/skarupke/flat_hash_map)
+- [tsl::robin_map](https://github.com/Tessil/robin-map)
 
 Here is an example taken from the jupyter notebook for the last benchmarks. It measure
 the time it takes to randomly insert and after few other operations (insert and erase)
@@ -20,9 +23,5 @@ erase the element.
 
 ## TODO
 
-- complete the benchmark list : find, iterate over the container
-- add tools to
-    - parse google benchmark output
-    - generate graphs
+- complete the benchmark list : do more relevant tests cases (find miss/hit for example)
 - add benchmarks for other containers
-- add more thirdparties libraries
