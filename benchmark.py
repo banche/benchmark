@@ -257,8 +257,8 @@ template="""
 """
 
 if __name__ == '__main__':
-    arg_parser = argparse.ArgumentParser(description='Parse google benchmark output')
-    arg_parser.add_argument('file', help='input filename')
+    arg_parser = argparse.ArgumentParser(description='Parse google benchmark output and generates charts!')
+    arg_parser.add_argument('file', help='google benchmark output as a json file')
     args = arg_parser.parse_args()
 
     with open(args.file, 'r+') as f:
