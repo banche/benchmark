@@ -23,6 +23,27 @@ erase the element.
 
 ![example](https://github.com/banche/benchmark/blob/master/result_insert_erase_random.png "Random Insert/Erase performances")
 
+## Requirements
+
+The repository is using submodules for thirparties libraries so make sure
+you also clone the submodules before running `cmake`
+
+## Run the benchmarks
+
+The project is using CMake build-system, here is an example to configure, build and run the benchmarks
+```bash
+$ mkdir -p build
+$ cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_TESTING=OFF . build
+$ cd build && make -j12
+$ cd -
+```
+
+Once everything is build you can just run the benchmark and wait for the results to come! You will need `python3` and `jinja2` package installed to generate the plots
+
+```bash
+$ build/hashmap --benchmark_min_time=2 --benchmark_format=json | python3 benchmark.py
+```
+Once this is done this will open a web browser with all the plots in one page.
 
 ## TODO
 
@@ -30,5 +51,4 @@ erase the element.
 - try to make benchmark.py more generic
     - it only works for cases called with `BENCHMARK_TEMPLATE()->Arg`
     - it should support several input files
-    - it should be able to read from stdin
 - add benchmarks for other containers
