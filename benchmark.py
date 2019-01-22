@@ -7,10 +7,6 @@ import jinja2
 import webbrowser
 import os
 
-import plotly
-import plotly.plotly as py
-import plotly.graph_objs as go
-
 def parse_benchmark_name(name: str):
     """
     Parses a template benchmark name with a size
@@ -128,46 +124,6 @@ def group_benchmarks(benchmarks : dict()):
             data[plot_key] = PlotBench(plot_key, x_values)
         data[plot_key].add_trace(line_name, y_values)
     return data
-
-def plot_benchmarks(benchmarks : dict()):
-    data = collections.OrderedDict()
-    plot_titles = list()
-    for name, benchmark in benchmarks.items():
-        x_values = [b.size for b in benchmark]
-        y_values = [b.cpu_time/b.size for b in benchmark]
-        params = benchmark[0].t_params
-        plot_key = benchmark[0].name
-        if len(params) == 3:
-            line_name = params[2] + '<' + params[0] + ', ' + params[1] + '>'
-            plot_key += '<' + params[0] + ', ' + params[1] + '>'
-        else:
-
-            line_name = params[1] + '<' + params[0] + ', Action<' + params[0] + '>>'
-            plot_key += '<' + params[0] + ', Action<' + params[0] + '>>'
-
-        trace = go.Scatter(
-            x = x_values,
-            y = y_values,
-            mode = 'lines+markers',
-            name = line_name,
-            legendgroup = name,
-        )
-        if not plot_key in data.keys():
-            data[plot_key] = list()
-            plot_titles.append(plot_key)
-        print('k %s %s %s' % (plot_key + ' ' + name, x_values, y_values))
-        data[plot_key].append(trace)
-
-
-    fig = plotly.tools.make_subplots(rows=len(data.keys()), subplot_titles=plot_titles)
-    i = 1
-    for k, traces in data.items():
-        for t in traces:
-            fig.append_trace(t, i, 1)
-        i+= 1
-
-    fig['layout'].update(height=2800, width=1200, title='hashmap performance')
-    plotly.offline.plot(fig)
 
 template="""
 <!DOCTYPE html>
