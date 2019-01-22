@@ -6,6 +6,7 @@ import collections
 import jinja2
 import webbrowser
 import os
+import sys
 
 def parse_benchmark_name(name: str):
     """
@@ -214,20 +215,24 @@ template="""
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='Parse google benchmark output and generates charts!')
-    arg_parser.add_argument('file', help='google benchmark output as a json file')
+    arg_parser.add_argument('-f','--file', help='google benchmark output as a json file', default='')
     args = arg_parser.parse_args()
 
-    with open(args.file, 'r+') as f:
-        data = json.load(f)
-        benchmarks = parse_benchmark_json(data)
-        plot_data = group_benchmarks(benchmarks)
+    if args.file != '':
+        with open(args.file, 'r+') as f:
+            data = json.load(f)
+    else:
+        data = json.load(sys.stdin)
 
-        t = jinja2.Template(template)
-        html = t.render(benchmarks=plot_data)
-        output = 'benchmarks-results.html'
-        with open(output, 'w+') as f:
-            f.write(html)
-            webbrowser.open(os.path.abspath(output))
+    benchmarks = parse_benchmark_json(data)
+    plot_data = group_benchmarks(benchmarks)
+
+    t = jinja2.Template(template)
+    html = t.render(benchmarks=plot_data)
+    output = 'benchmarks-results.html'
+    with open(output, 'w+') as f:
+        f.write(html)
+        webbrowser.open(os.path.abspath(output))
         #print(html)
         #pprint(plot_data)
         #pprint(benchmarks)
