@@ -10,3 +10,6 @@
 [submodule "thirdparties/tsl-robin-map"]
 	path = thirdparties/tsl-robin-map
 	url = https://github.com/Tessil/robin-map.git
+[submodule "thirdparties/folly"]
+	path = thirdparties/folly
+	url = https://github.com/facebook/folly.git
