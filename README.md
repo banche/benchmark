@@ -16,6 +16,7 @@ benchmarks right now
 - QHash
 - [ska::flat_hash_map](https://github.com/skarupke/flat_hash_map)
 - [tsl::robin_map](https://github.com/Tessil/robin-map)
+- [folly::F14FastMap](https://github.com/facebook/folly/blob/master/folly/container/F14.md)
 
 Here is an example taken from the generated output for the last benchmarks. It measure
 the time it takes to randomly insert and after few other operations (insert and erase)
@@ -41,7 +42,7 @@ $ cd -
 Once everything is build you can just run the benchmark and wait for the results to come! You will need `python3` and `jinja2` package installed to generate the plots
 
 ```bash
-$ build/hashmap --benchmark_min_time=2 --benchmark_format=json | python3 benchmark.py
+$ build/yoshi/hashmap/hashmap --benchmark_min_time=2 --benchmark_format=json | python3 benchmark.py
 ```
 Once this is done this will open a web browser with all the plots in one page.
 
@@ -52,3 +53,4 @@ Once this is done this will open a web browser with all the plots in one page.
     - it only works for cases called with `BENCHMARK_TEMPLATE()->Arg`
     - it should support several input files
 - add benchmarks for other containers
+- add short and long mode when running the benchmark and also a size to use
