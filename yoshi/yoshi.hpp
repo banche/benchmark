@@ -14,9 +14,11 @@ struct Benchmark
     using Function = std::function<void(benchmark::State&)>;
     std::string name;
     Function benchmark;
-    Benchmark(const char* n, Function f)
+    bool shortArgs;
+    Benchmark(const char* n, Function f, bool s = false)
         : name(n)
         , benchmark(f)
+        , shortArgs(s)
     {
     }
 };
@@ -28,14 +30,17 @@ using BenchmarkPtr = std::unique_ptr<Benchmark>;
 class Benchmarks
 {
 public:
-    Benchmarks() = delete;
+    static Benchmarks* instance();
     /// Adds the benchmark in the list
-    static Benchmark* add(Benchmark* b);
+    Benchmark* add(Benchmark* b);
     /// Returns all the benchmarks
-    static const std::vector<BenchmarkPtr>& get();
+    const std::vector<BenchmarkPtr>& get();
 private:
-    static std::vector<BenchmarkPtr> s_benchmarks;
+    Benchmarks() = default;
+    std::vector<BenchmarkPtr> m_benchmarks;
 };
+
+Benchmark* add(Benchmark* b);
 
 }
 }
@@ -59,7 +64,15 @@ private:
 // Helper to add a benchmark
 #define YOSHI_ADD_BENCHMARK(f, ...)                                 \
     static yoshi::internal::Benchmark*                              \
-        YOSHI_PRIVATE_NAME(f) = yoshi::internal::Benchmarks::add(   \
+        YOSHI_PRIVATE_NAME(f) = yoshi::internal::add(               \
         new yoshi::internal::Benchmark(                             \
             #f "<" #__VA_ARGS__ ">",                                \
             [=](auto& st) { f<__VA_ARGS__>(st);}));
+
+#define YOSHI_ADD_SHORT_BENCHMARK(f, ...)                           \
+    static yoshi::internal::Benchmark*                              \
+        YOSHI_PRIVATE_NAME(f) = yoshi::internal::add(               \
+            new yoshi::internal::Benchmark(                         \
+                #f "<" #__VA_ARGS__ ">",                            \
+                [=](auto& st) { f<__VA_ARGS__>(st);},               \
+                true));

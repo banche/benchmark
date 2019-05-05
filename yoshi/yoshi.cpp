@@ -4,19 +4,26 @@
 
 namespace yoshi {
 namespace internal {
-std::vector<BenchmarkPtr> Benchmarks::s_benchmarks;
+Benchmark* add(Benchmark* b)
+{
+    return Benchmarks::instance()->add(b);
+}
 
 Benchmark* Benchmarks::add(Benchmark* b)
 {
-    std::cout << "Creating! " << b->name << "\n";
-    s_benchmarks.emplace_back(b);
-    std::cout << s_benchmarks.size() << "\n";
-    return s_benchmarks.back().get();
+    m_benchmarks.emplace_back(b);
+    return m_benchmarks.back().get();
 }
 
 const std::vector<BenchmarkPtr>& Benchmarks::get()
 {
-    return s_benchmarks;
+    return m_benchmarks;
+}
+
+Benchmarks* Benchmarks::instance()
+{
+    static Benchmarks s_instance;
+    return &s_instance;
 }
 }
 }

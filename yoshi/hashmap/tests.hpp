@@ -1,8 +1,7 @@
 #pragma once
 
 #include "adapter.hpp"
-
-#include <benchmark/benchmark.h>
+#include "yoshi/yoshi.hpp"
 
 #include <algorithm>
 #include <random>
@@ -304,12 +303,12 @@ static void BM_Insert_Erase_Random(benchmark::State& state)
 }
 
 #define DECLARE_ALL_TESTS(C) \
-    BENCHMARK_TEMPLATE(BM_Insert_Sequential, int64_t, int64_t, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Insert_Sequential, int32_t, int32_t, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, int64_t, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Insert_Random, int64_t, std::string, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Erase_Sequential, int64_t, int64_t, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Erase_Random, int64_t, int64_t, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Find_Sequential, int64_t, int64_t, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Find_Random, int64_t, int64_t, C)->Arg(1000)->Arg(10000)->Arg(50000)->Arg(100000)->Arg(250000)->Arg(500000)->Arg(750000)->Arg(1000000); \
-    BENCHMARK_TEMPLATE(BM_Insert_Erase_Random, int64_t, C)->Arg(1000)->Arg(5000)->Arg(10000)->Arg(25000)->Arg(50000)->Arg(75000)->Arg(100000);
+    YOSHI_ADD_BENCHMARK(BM_Insert_Sequential, int64_t, int64_t, C) \
+    YOSHI_ADD_BENCHMARK(BM_Insert_Sequential, int32_t, int32_t, C) \
+    YOSHI_ADD_BENCHMARK(BM_Insert_Random, int64_t, int64_t, C)     \
+    YOSHI_ADD_BENCHMARK(BM_Insert_Random, int64_t, std::string, C) \
+    YOSHI_ADD_BENCHMARK(BM_Erase_Sequential, int64_t, int64_t, C)  \
+    YOSHI_ADD_BENCHMARK(BM_Erase_Random, int64_t, int64_t, C)      \
+    YOSHI_ADD_BENCHMARK(BM_Find_Sequential, int64_t, int64_t, C)   \
+    YOSHI_ADD_BENCHMARK(BM_Find_Random, int64_t, int64_t, C)       \
+    YOSHI_ADD_SHORT_BENCHMARK(BM_Insert_Erase_Random, int64_t, C)

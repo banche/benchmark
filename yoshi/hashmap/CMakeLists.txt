@@ -8,12 +8,11 @@ set(BENCHMARKS_SRC
     folly.cpp
 )
 
-add_executable(hashmap hashmap.x.cpp ${BENCHMARKS_SRC})
+add_executable(hashmap ${BENCHMARKS_SRC})
 target_link_libraries(hashmap
-    yoshi
     absl::flat_hash_map
     Qt5::Core
     tsl::robin_map
     folly
+    yoshi_main
 )
-
