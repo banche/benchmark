@@ -8,7 +8,7 @@
 
 /// Inserts [0, state.range(0) -1] in sequential order
 template <typename K, typename V, template<typename ...> typename H>
-void BM_Insert_Sequential(benchmark::State& state)
+void Insert_Sequential(benchmark::State& state)
 {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
@@ -29,7 +29,7 @@ void BM_Insert_Sequential(benchmark::State& state)
 
 /// Inserts [0, state.range(0) -1] in random order
 template <typename K, typename V, template<typename ...> typename H>
-static void BM_Insert_Random(benchmark::State& state)
+static void Insert_Random(benchmark::State& state)
 {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
@@ -63,7 +63,7 @@ static void BM_Insert_Random(benchmark::State& state)
 /// Inserts [0, state.range(0) -1] in sequential order and measure the time
 /// to do the erase inside [0, state.range(0) -1] in a sequential order
 template <typename K, typename V, template<typename ...> typename H>
-static void BM_Erase_Sequential(benchmark::State& state)
+static void Erase_Sequential(benchmark::State& state)
 {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
@@ -89,7 +89,7 @@ static void BM_Erase_Sequential(benchmark::State& state)
 /// Inserts [0, state.range(0) -1] in random order and measure the time
 /// to do the erase inside [0, state.range(0) -1] in a random order (different than insertion)
 template <typename K, typename V, template<typename ...> typename H>
-static void BM_Erase_Random(benchmark::State& state)
+static void Erase_Random(benchmark::State& state)
 {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
@@ -129,7 +129,7 @@ static void BM_Erase_Random(benchmark::State& state)
 /// Inserts [0, state.range(0) -1] in sequential order and measure the time
 /// to do the find inside [0, state.range(0) -1] in a sequential order
 template <typename K, typename V, template<typename ...> typename H>
-static void BM_Find_Sequential(benchmark::State& state)
+static void Find_Sequential(benchmark::State& state)
 {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
@@ -166,7 +166,7 @@ static void BM_Find_Sequential(benchmark::State& state)
 /// Inserts [0, state.range(0) -1] in random order and measure the time
 /// to do the find in [0, state.range(0) -1] in a random order (different from insert)
 template <typename K, typename V, template<typename ...> typename H>
-static void BM_Find_Random(benchmark::State& state)
+static void Find_Random(benchmark::State& state)
 {
     using AdapterT = Adapter<K, V, H>;
     using Type = typename AdapterT::C;
@@ -265,7 +265,7 @@ Actions<T> generateRandomActions(int64_t count)
 }
 
 template <typename K, template<typename ...> typename H>
-static void BM_Insert_Erase_Random(benchmark::State& state)
+static void Insert_Erase_Random(benchmark::State& state)
 {
     using AdapterT = Adapter<K, Action<K>, H>;
     using CType = typename AdapterT::C;
@@ -303,12 +303,12 @@ static void BM_Insert_Erase_Random(benchmark::State& state)
 }
 
 #define DECLARE_ALL_TESTS(C) \
-    YOSHI_ADD_BENCHMARK(BM_Insert_Sequential, int64_t, int64_t, C) \
-    YOSHI_ADD_BENCHMARK(BM_Insert_Sequential, int32_t, int32_t, C) \
-    YOSHI_ADD_BENCHMARK(BM_Insert_Random, int64_t, int64_t, C)     \
-    YOSHI_ADD_BENCHMARK(BM_Insert_Random, int64_t, std::string, C) \
-    YOSHI_ADD_BENCHMARK(BM_Erase_Sequential, int64_t, int64_t, C)  \
-    YOSHI_ADD_BENCHMARK(BM_Erase_Random, int64_t, int64_t, C)      \
-    YOSHI_ADD_BENCHMARK(BM_Find_Sequential, int64_t, int64_t, C)   \
-    YOSHI_ADD_BENCHMARK(BM_Find_Random, int64_t, int64_t, C)       \
-    YOSHI_ADD_SHORT_BENCHMARK(BM_Insert_Erase_Random, int64_t, C)
+    YOSHI_ADD_BENCHMARK(Insert_Sequential, int64_t, int64_t, C) \
+    YOSHI_ADD_BENCHMARK(Insert_Sequential, int32_t, int32_t, C) \
+    YOSHI_ADD_BENCHMARK(Insert_Random, int64_t, int64_t, C)     \
+    YOSHI_ADD_BENCHMARK(Insert_Random, int64_t, std::string, C) \
+    YOSHI_ADD_BENCHMARK(Erase_Sequential, int64_t, int64_t, C)  \
+    YOSHI_ADD_BENCHMARK(Erase_Random, int64_t, int64_t, C)      \
+    YOSHI_ADD_BENCHMARK(Find_Sequential, int64_t, int64_t, C)   \
+    YOSHI_ADD_BENCHMARK(Find_Random, int64_t, int64_t, C)       \
+    YOSHI_ADD_SHORT_BENCHMARK(Insert_Erase_Random, int64_t, C)
