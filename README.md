@@ -46,6 +46,17 @@ $ build/yoshi/hashmap/hashmap --benchmark_min_time=2 --benchmark_format=json | p
 ```
 Once this is done this will open a web browser with all the plots in one page.
 
+### Compare 2 implementations
+You can also run the benchmark more precisely to compare for example only 2 implementations, that line will only run the short mode
+```bash
+$ build/yoshi/hashmap/hashmap -s --benchmark_filter=".*absl.*|.*folly.*"
+```
+
+If you just want to run one test case for two implementations you can be even more precise in the regexp
+```
+$ ./hashmap -s --benchmark_filter="BM_Insert_Erase_Random.*absl.*|BM_Insert_Erase_Random.*folly.*"
+```
+
 ## TODO
 
 - complete the benchmark list : do more relevant tests cases (find miss/hit for example)
@@ -53,4 +64,3 @@ Once this is done this will open a web browser with all the plots in one page.
     - it only works for cases called with `BENCHMARK_TEMPLATE()->Arg`
     - it should support several input files
 - add benchmarks for other containers
-- add short and long mode when running the benchmark and also a size to use
