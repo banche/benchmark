@@ -353,6 +353,64 @@ void Find_HalfHit(benchmark::State& state)
     }
 }
 
+template <typename K, typename V, template<typename ...> typename H>
+void Find_Miss(benchmark::State& state)
+{
+    using AdapterT = Adapter<K, V, H>;
+    using Type = typename AdapterT::C;
+    Type c;
+    const auto value = ValueSelector<V>::value();
+
+    std::vector<K> keys;
+    std::vector<K> missing;
+    keys.reserve(state.range(0));
+    missing.reserve(state.range(0));
+    const std::int64_t SEED = 0;
+    std::mt19937_64 generator(SEED);
+
+    for(auto _: state)
+    {
+        state.PauseTiming();
+        keys.clear();
+        missing.clear();
+        for(K i = 0; i < state.range(0); ++i)
+        {
+            keys.push_back(i);
+        }
+        std::shuffle(keys.begin(), keys.end(), generator);
+        AdapterT::clear(c);
+        AdapterT::reserve(c, state.range(0));
+        int64_t inserted = 0;
+        for (K i = 0; i < state.range(0); i++)
+        {
+            const bool isEven = (i%2 == 0);
+            if (isEven)
+            {
+                auto key = keys[i];
+                AdapterT::insert(c, key, value);
+                inserted++;
+            }
+            else
+            {
+                missing.push_back(keys[i]);
+            }
+        }
+        state.ResumeTiming();
+        int64_t found = 0;
+        for (auto k: missing)
+        {
+            auto it = AdapterT::find(c, k);
+            found += (it != AdapterT::end(c));
+        }
+        state.PauseTiming();
+        if (found != 0)
+        {
+            throw std::runtime_error("should not be able to find any element");
+        }
+        state.ResumeTiming();
+    }
+}
+
 #define DECLARE_ALL_TESTS(C) \
     YOSHI_ADD_BENCHMARK(Insert_Sequential, int64_t, int64_t, C) \
     YOSHI_ADD_BENCHMARK(Insert_Sequential, int32_t, int32_t, C) \
@@ -364,3 +422,4 @@ void Find_HalfHit(benchmark::State& state)
     YOSHI_ADD_BENCHMARK(Find_Random, int64_t, int64_t, C)       \
     YOSHI_ADD_SHORT_BENCHMARK(Insert_Erase_Random, int64_t, C)  \
     YOSHI_ADD_BENCHMARK(Find_HalfHit, int64_t, int64_t, C)      \
+    YOSHI_ADD_BENCHMARK(Find_Miss, int64_t, int64_t, C)
