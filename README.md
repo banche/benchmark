@@ -54,12 +54,11 @@ $ build/yoshi/hashmap/hashmap -s --benchmark_filter=".*absl.*|.*folly.*"
 
 If you just want to run one test case for two implementations you can be even more precise in the regexp
 ```
-$ ./hashmap -s --benchmark_filter="BM_Insert_Erase_Random.*absl.*|BM_Insert_Erase_Random.*folly.*"
+$ ./hashmap -s --benchmark_filter="Insert_Erase_Random.*absl.*|Insert_Erase_Random.*folly.*"
 ```
 
 ## TODO
 
-- complete the benchmark list : do more relevant tests cases (find miss/hit for example)
 - try to make benchmark.py more generic
     - it only works for cases called with `BENCHMARK_TEMPLATE()->Arg`
     - it should support several input files
