@@ -7,6 +7,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char** argv)
 {
+    benchmark::Initialize(&argc, argv);
     bool help = false;
     bool short_run = false;
     try
@@ -58,6 +59,5 @@ int main(int argc, char** argv)
             }
         }
     }
-    benchmark::Initialize(&argc, argv);
     benchmark::RunSpecifiedBenchmarks();
 }
