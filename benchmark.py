@@ -213,7 +213,8 @@ template="""
 </html>
 """
 
-def merge_dict(to_update: collections.defaultdict(list), other: collections.defaultdict(list)):
+def merge_dict(to_update: collections.defaultdict(list),
+               other: collections.defaultdict(list)):
     """
     Merge benchmarks dictionnaries together
     >>> from collections import defaultdict
@@ -248,7 +249,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-f','--files', help='google benchmark output as a json file', default=[], action='append')
     args = arg_parser.parse_args()
 
-    if args.file:
+    if args.files:
         benchmarks = load_files(args.files)
     else:
         data = json.load(sys.stdin)
