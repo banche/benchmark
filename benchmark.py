@@ -213,18 +213,47 @@ template="""
 </html>
 """
 
+def merge_dict(to_update: collections.defaultdict(list), other: collections.defaultdict(list)):
+    """
+    Merge benchmarks dictionnaries together
+    >>> from collections import defaultdict
+    >>> a = defaultdict(list)
+    >>> b = defaultdict(list)
+    >>> a[1] = [1,2]
+    >>> a[2] = [3,4]
+    >>> b[1] = [3,4]
+    >>> b[2] = [1,2]
+    >>> b[3] = [5,6]
+    >>> merge_dict(a,b)
+    defaultdict(<class 'list'>, {1: [1, 2, 3, 4], 2: [3, 4, 1, 2], 3: [5, 6]})
+    """
+    for k,v in other.items():
+        if k in to_update.keys():
+            to_update[k] += v
+        else:
+            to_update[k] = v
+    return to_update
+
+def load_files(files: list):
+    benchmarks = collections.defaultdict(list)
+    for file in files:
+        with open(file, 'r+') as f:
+            fdata = json.load(f)
+            fbenchmarks = parse_benchmark_json(fdata)
+            merge_dict(benchmarks, fbenchmarks)
+    return benchmarks
+
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='Parse google benchmark output and generates charts!')
-    arg_parser.add_argument('-f','--file', help='google benchmark output as a json file', default='')
+    arg_parser.add_argument('-f','--files', help='google benchmark output as a json file', default=[], action='append')
     args = arg_parser.parse_args()
 
-    if args.file != '':
-        with open(args.file, 'r+') as f:
-            data = json.load(f)
+    if args.file:
+        benchmarks = load_files(args.files)
     else:
         data = json.load(sys.stdin)
+        benchmarks = parse_benchmark_json(data)
 
-    benchmarks = parse_benchmark_json(data)
     plot_data = group_benchmarks(benchmarks)
 
     t = jinja2.Template(template)
