@@ -7,5 +7,24 @@ target_link_libraries(yoshi_main
     PUBLIC yoshi
     PRIVATE Boost::program_options)
 
+function(yoshi_add_benchmark name)
+    # simple function to create a benchmark
+    set(options )
+    set(oneValueArgs )
+    set(multiValueArgs SRC DEPENDS)
+    cmake_parse_arguments(_add
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN})
+
+    message("${name}; src ${_add_SRC}; deps ${_add_DEPENDS}")
+
+    add_executable(${name} ${_add_SRC})
+    target_link_libraries(${name}
+        ${_add_DEPENDS}
+        yoshi_main)
+endfunction()
+
 # benchmarks folder
 add_subdirectory(hashmap)
