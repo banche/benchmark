@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <random>
+#include <chrono>
 
 /// Inserts [0, state.range(0) -1] in sequential order
 template <typename K, typename V, template<typename ...> typename H>
@@ -421,6 +422,7 @@ void Rehash_Impl(benchmark::State& state, std::true_type)
     using Type = typename AdapterT::C;
 
     Type c;
+    AdapterT::reserve(c, state.range(0));
     const auto value = ValueSelector<V>::value();
     // generate dataset
     for(K i = 0; i < state.range(0); ++i)
@@ -440,6 +442,38 @@ void Rehash_Impl(benchmark::State& state, std::false_type)
 {
     // If the container does not support unconditionalRehash then
     // the easiest way to mesure the rehash is to look for a costly insert...
+    using AdapterT = Adapter<K, V, H>;
+    using TraitsT = Traits<K, V, H>;
+    using Type = typename AdapterT::C;
+
+    Type c;
+    AdapterT::reserve(c, state.range(0));
+    const auto value = ValueSelector<V>::value();
+    // generate dataset
+    for(K i = 0; i < state.range(0); ++i)
+    {
+        AdapterT::insert(c, i, value);
+    }
+
+    for (auto _: state)
+    {
+        // copy
+        auto copy = c;
+        int64_t current_time = 0;
+        int64_t max_time = 0;
+        int i = state.range(0);
+        do {
+            auto start = std::chrono::high_resolution_clock::now();
+            AdapterT::insert(copy, i, value);
+            auto end   = std::chrono::high_resolution_clock::now();
+
+            current_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    end - start).count();
+            max_time = std::max(current_time, max_time);
+        } while (current_time * 5 < max_time);
+
+        state.SetIterationTime(max_time);
+    }
 }
 
 template <typename K, typename V, template<typename ...> typename H>
