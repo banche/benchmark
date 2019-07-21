@@ -1,6 +1,8 @@
 #pragma once
 
 #include "adapter.hpp"
+#include "traits.hpp"
+
 #include "yoshi/yoshi.hpp"
 
 #include <algorithm>
@@ -411,6 +413,42 @@ void Find_Miss(benchmark::State& state)
     }
 }
 
+template <typename K, typename V, template<typename ...> typename H>
+void Rehash_Impl(benchmark::State& state, std::true_type)
+{
+    using AdapterT = Adapter<K, V, H>;
+    using TraitsT = Traits<K, V, H>;
+    using Type = typename AdapterT::C;
+
+    Type c;
+    const auto value = ValueSelector<V>::value();
+    // generate dataset
+    for(K i = 0; i < state.range(0); ++i)
+    {
+        AdapterT::insert(c, i, value);
+    }
+    // benchmark : we can just do a rehash
+    for(auto _: state)
+    {
+        AdapterT::unconditionalRehash(c);
+        benchmark::ClobberMemory();
+    }
+}
+
+template <typename K, typename V, template<typename ...> typename H>
+void Rehash_Impl(benchmark::State& state, std::false_type)
+{
+    // If the container does not support unconditionalRehash then
+    // the easiest way to mesure the rehash is to look for a costly insert...
+}
+
+template <typename K, typename V, template<typename ...> typename H>
+void Rehash(benchmark::State& state)
+{
+    using SupportUnconditionnalRehash = typename Traits<K, V, H>::SupportUnconditionnalRehash;
+    Rehash_Impl<K,V,H>(state, SupportUnconditionnalRehash{});
+}
+
 #define DECLARE_ALL_TESTS(C) \
     YOSHI_ADD_BENCHMARK(Insert_Sequential, int64_t, int64_t, C) \
     YOSHI_ADD_BENCHMARK(Insert_Sequential, int32_t, int32_t, C) \
@@ -422,4 +460,5 @@ void Find_Miss(benchmark::State& state)
     YOSHI_ADD_BENCHMARK(Find_Random, int64_t, int64_t, C)       \
     YOSHI_ADD_SHORT_BENCHMARK(Insert_Erase_Random, int64_t, C)  \
     YOSHI_ADD_BENCHMARK(Find_HalfHit, int64_t, int64_t, C)      \
-    YOSHI_ADD_BENCHMARK(Find_Miss, int64_t, int64_t, C)
+    YOSHI_ADD_BENCHMARK(Find_Miss, int64_t, int64_t, C)         \
+    YOSHI_ADD_SHORT_BENCHMARK(Rehash, int64_t, int64_t, C)

@@ -24,6 +24,7 @@ struct Adapter
     static void clear(C& c) { c.clear(); }
     static auto begin(C& c) { return c.begin(); }
     static auto end(C& c) { return c.end(); }
+    static auto unconditionalRehash(C& c) { c.rehash(0); }
 };
 
 
