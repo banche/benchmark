@@ -18,8 +18,6 @@ function(yoshi_add_benchmark name)
         "${multiValueArgs}"
         ${ARGN})
 
-    message("${name}; src ${_add_SRC}; deps ${_add_DEPENDS}")
-
     add_executable(${name} ${_add_SRC})
     target_link_libraries(${name}
         ${_add_DEPENDS}
