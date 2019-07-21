@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include <iostream>
 
 /// Inserts [0, state.range(0) -1] in sequential order
 template <typename K, typename V, template<typename ...> typename H>
@@ -450,7 +451,8 @@ void Rehash_Impl(benchmark::State& state, std::false_type)
     AdapterT::reserve(c, state.range(0));
     const auto value = ValueSelector<V>::value();
     // generate dataset
-    for(K i = 0; i < state.range(0); ++i)
+    const auto offset = state.range(0) - 5;
+    for(K i = 0; i < offset; ++i)
     {
         AdapterT::insert(c, i, value);
     }
@@ -461,16 +463,20 @@ void Rehash_Impl(benchmark::State& state, std::false_type)
         auto copy = c;
         int64_t current_time = 0;
         int64_t max_time = 0;
-        int i = state.range(0);
+        int i = 0;
         do {
+            // filter out 5 first values
+            if (i > 5)
+            {
+                max_time = std::max(current_time, max_time);
+            }
             auto start = std::chrono::high_resolution_clock::now();
-            AdapterT::insert(copy, i, value);
+            AdapterT::insert(copy, i + offset, value);
             auto end   = std::chrono::high_resolution_clock::now();
-
+            ++i;
             current_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
                     end - start).count();
-            max_time = std::max(current_time, max_time);
-        } while (current_time * 5 < max_time);
+        } while (i < 5 || current_time * 50 > max_time);
 
         state.SetIterationTime(max_time);
     }
@@ -480,7 +486,7 @@ template <typename K, typename V, template<typename ...> typename H>
 void Rehash(benchmark::State& state)
 {
     using SupportUnconditionnalRehash = typename Traits<K, V, H>::SupportUnconditionnalRehash;
-    Rehash_Impl<K,V,H>(state, SupportUnconditionnalRehash{});
+    Rehash_Impl<K,V,H>(state, std::false_type{});
 }
 
 #define DECLARE_ALL_TESTS(C) \
