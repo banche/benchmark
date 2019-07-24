@@ -45,6 +45,18 @@ class Benchmark(object):
                 (self.name, str(self.t_params), self.size, self.iterations, self.real_time, \
                  self.cpu_time, self.unit)
 
+    def value(self):
+        if self.name.find('Rehash') != -1:
+            return self.cpu_time
+        else:
+            return self.cpu_time / self.size
+
+    def legend(self):
+        if self.name.contains('Rehash'):
+            return 'Nanoseconds/rehash'
+        else:
+            return 'Nanoseconds/element'
+
     @staticmethod
     def from_json(dct: dict):
         """
@@ -110,9 +122,9 @@ class PlotBench(object):
 
 def group_benchmarks(benchmarks : dict()):
     data = collections.OrderedDict()
-    for name, benchmark in benchmarks.items():
+    for _, benchmark in benchmarks.items():
         x_values = [b.size for b in benchmark]
-        y_values = [b.cpu_time/b.size for b in benchmark]
+        y_values = [b.value() for b in benchmark]
         params = benchmark[0].t_params
         plot_key = benchmark[0].name
         if len(params) == 3:
@@ -192,7 +204,7 @@ template="""
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Nanos per operation (per element)'
+                            labelString: 'Nanos per operation'
                         }
                     }]
                 }
