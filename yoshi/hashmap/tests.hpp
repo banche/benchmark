@@ -476,7 +476,7 @@ void Rehash_Impl(benchmark::State& state, std::false_type)
             ++i;
             current_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
                     end - start).count();
-        } while (i < 5 || current_time * 50 > max_time);
+        } while (i < 5 || current_time * 25 > max_time);
 
         state.SetIterationTime(max_time);
     }
