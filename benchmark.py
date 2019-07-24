@@ -32,6 +32,8 @@ class Benchmark(object):
     """
     Benchmark class to hold all the information from google benchmark output
     """
+    __all_benchmarks = dict()
+
     def __init__(self, benchmark_name, iterations, real_time, cpu_time, unit):
         self.name, self.t_params, self.size = parse_benchmark_name(benchmark_name)
         self.full_name = parse_benchmark_full_name(benchmark_name)
@@ -39,6 +41,19 @@ class Benchmark(object):
         self.real_time = real_time
         self.cpu_time = cpu_time
         self.unit = unit
+        self.run_name = benchmark_name
+        self.mean = None
+        self.median = None
+        self.stddev = None
+
+    def cpu_time(self):
+        if self.median is None:
+            return self.cpu_time
+        else:
+            return self.median
+
+    def stddev(self):
+        return self.stddev
 
     def __str__(self):
         return '{name: %s, params: %s, size_per_iter: %d, iter: %d, real_time: %f, cpu_time: %f, unit: %s}' % \
@@ -66,16 +81,53 @@ class Benchmark(object):
         >>> s += '"run_name": "BM_Insert_Random<int64_t, int64_t, std::unordered_map>/1000",'
         >>> s += '"run_type": "iteration", "iterations": 17959,"real_time": 3.9503851248171341e+04,'
         >>> s += '"cpu_time": 3.9102234367170080e+04, "time_unit": "ns"}'
-        >>> Benchmark.from_json(json.loads(s)).__str__()
-        "{name: BM_Insert_Random, params: ['int64_t', 'int64_t', 'std::unordered_map'], size_per_iter: 1000, iter: 17959, real_time: 39503.851248, cpu_time: 39102.234367, unit: ns}"
+        >>> b = Benchmark.from_json(json.loads(s))
+        >>> print(b)
+        {name: BM_Insert_Random, params: ['int64_t', 'int64_t', 'std::unordered_map'], size_per_iter: 1000, iter: 17959, real_time: 39503.851248, cpu_time: 39102.234367, unit: ns}
+        >>> s = '{ "name": "BM_Insert_Random<int64_t, int64_t, std::unordered_map>/1000_mean",'
+        >>> s += '"run_name": "BM_Insert_Random<int64_t, int64_t, std::unordered_map>/1000",'
+        >>> s += '"run_type": "aggregate", "iterations": 10,"real_time": 3.9503851248171341e+04,'
+        >>> s += '"aggregate_name": "mean", "cpu_time": 42, "time_unit": "ns"}'
+        >>> print(Benchmark.from_json(json.loads(s)))
+        None
+        >>> print(b.mean, b.iteration)
+        42 10
         """
-        return Benchmark(
-                dct['name'],
+        if dct['run_name'] == dct['name']:
+            b = Benchmark(
+                dct['run_name'],
                 dct['iterations'],
                 dct['real_time'],
                 dct['cpu_time'],
                 dct['time_unit'])
-
+            Benchmark.__all_benchmarks[b.run_name] = b
+            return b
+        else:
+            # we have iteration types
+            #   - insert if it does not exist
+            #   - update existing benchmark if needed
+            if dct['run_type'] == 'iteration':
+                if dct['run_name'] not in Benchmark.__all_benchmarks.keys():
+                    b = Benchmark(
+                        dct['run_name'],
+                        dct['iterations'],
+                        dct['real_time'],
+                        dct['cpu_time'],
+                        dct['time_unit'])
+                    Benchmark.__all_benchmarks[b.run_name] = b
+                    return b
+            elif dct['run_type'] == 'aggregate':
+                assert(dct['run_name'] in Benchmark.__all_benchmarks.keys())
+                b = Benchmark.__all_benchmarks[dct['run_name']]
+                aggregate_type = dct['aggregate_name']
+                if aggregate_type == 'mean':
+                    b.mean = dct['cpu_time']
+                    b.iteration = dct['iterations']
+                elif aggregate_type == 'median':
+                    b.median = dct['cpu_time']
+                elif aggregate_type == 'stddev':
+                    b.stddev = dct['cpu_time']
+        return None
 
 
 def parse_benchmark_json(input: dict):
@@ -88,7 +140,8 @@ def parse_benchmark_json(input: dict):
 
     for bench in ib:
         benchmark = Benchmark.from_json(bench)
-        benchmarks[benchmark.full_name].append(benchmark)
+        if benchmark is not None:
+            benchmarks[benchmark.full_name].append(benchmark)
 
     # TODO parse some of the context information to generate the final report
     return benchmarks
