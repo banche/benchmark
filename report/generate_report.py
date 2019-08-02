@@ -22,7 +22,8 @@ class PlotTrace(object):
 
 class PlotBench(object):
 
-    def __init__(self, name, x):
+    def __init__(self, short_name, name, x):
+        self.short_name = short_name
         self.name = name
         self.x = x
         self.traces = list()
@@ -45,6 +46,7 @@ def group_benchmarks(benchmarks : dict()):
         y_values = [b.value() for b in benchmark]
         params = benchmark[0].t_params
         plot_key = benchmark[0].name
+        short_name = benchmark[0].name
         if len(params) == 3:
             line_name = params[2] + '<' + params[0] + ', ' + params[1] + '>'
             plot_key += '<' + params[0] + ', ' + params[1] + '>'
@@ -52,7 +54,7 @@ def group_benchmarks(benchmarks : dict()):
             line_name = params[1] + '<' + params[0] + ', Action<' + params[0] + '>>'
             plot_key += '<' + params[0] + ', Action<' + params[0] + '>>'
         if not plot_key in data.keys():
-            data[plot_key] = PlotBench(plot_key, x_values)
+            data[plot_key] = PlotBench(short_name, plot_key, x_values)
         data[plot_key].add_trace(line_name, y_values)
     return data
 
@@ -63,11 +65,11 @@ if __name__ == '__main__':
     arg_parser.add_argument('-f','--files', help='google benchmark output as a json file', default=[], action='append')
     args = arg_parser.parse_args()
 
+    config = dict()
     if args.config:
         import importlib
         cfg = importlib.import_module(args.config.replace('.py', ''))
-        for d in cfg.descriptions:
-            print(d)
+        config = cfg.descriptions
 
     if args.files:
         benchmarks = load_files(args.files)
@@ -78,7 +80,7 @@ if __name__ == '__main__':
     plot_data = group_benchmarks(benchmarks)
 
     t = jinja2.Template(ht.template)
-    html = t.render(benchmarks=plot_data)
+    html = t.render(benchmarks=plot_data, config=config)
     output = 'benchmarks-results.html'
     with open(output, 'w+') as f:
         f.write(html)

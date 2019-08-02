@@ -64,7 +64,11 @@ template="""
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Nanos per operation'
+                            {% if b.short_name in config.keys() and config[b.short_name].legend is not none %}
+                                labelString: '{{config[b.short_name].legend}}'
+                            {% else %}
+                                labelString: 'Nanos per operation'
+                            {% endif %}
                         }
                     }]
                 }
@@ -84,4 +88,3 @@ template="""
     </body>
 </html>
 """
-
