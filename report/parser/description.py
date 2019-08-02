@@ -12,7 +12,6 @@ class Description(object):
         self.details = None
         self.legend = None
 
-        print(kwargs.keys())
         if 'description' in kwargs.keys():
             self.description = kwargs['description']
         if 'details' in kwargs.keys():
@@ -22,4 +21,3 @@ class Description(object):
 
     def __str__(self):
         return '{ ' + self.name + ': ' + self.description + '}'
-
