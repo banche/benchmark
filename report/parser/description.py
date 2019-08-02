@@ -1,31 +1,25 @@
-# Configuration for the benchmarks
 
 class Description(object):
-
+    """
+    Simple wrapper to hold the benchmark description
+    """
     def __init__(self, name, **kwargs):
         self.name = name
 
         # args parsed from kwargs
         self.global_timing = False
-        self.description = ""
-        self.details = ""
+        self.description = None
+        self.details = None
+        self.legend = None
 
         print(kwargs.keys())
         if 'description' in kwargs.keys():
             self.description = kwargs['description']
         if 'details' in kwargs.keys():
             self.details = kwargs['details']
+        if 'legend' in kwargs.keys():
+            self.legend = kwargs['legend']
 
     def __str__(self):
         return '{ ' + self.name + ': ' + self.description + '}'
 
-descriptions = dict()
-
-rehash = Description('Rehash',
-        global_timing = True,
-        description = 'Rehash benchmark',
-        details = 'Measures the time taken to insert an element which will lead to a rehash'
-)
-
-
-descriptions[rehash.name] = rehash
