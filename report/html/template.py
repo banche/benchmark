@@ -8,7 +8,15 @@ template="""
     </head>
     <body>
     {% for _, b in benchmarks.items() %}
-    <div style="width:60%;">
+    <div style="width:75%;">
+        {% if b.short_name in config.keys() and config[b.short_name].description is not none %}
+            <center>
+            <h3> {{config[b.short_name].description}} </h3>
+            {% if config[b.short_name].details is not none %}
+                <p> {{ config[b.short_name].details }} </p>
+            {% endif %}
+            </center>
+        {% endif %}
         <canvas id="{{ b.name }}"></canvas>
     </div>
     {% endfor %}

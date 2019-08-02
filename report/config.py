@@ -9,7 +9,9 @@ rehash = Description('Rehash',
 
 insert_erase_random = Description(
     name = 'BM_Insert_Erase_Random',
-    legend = 'nanoseconds per element / operation'
+    legend = 'nanoseconds per element / operation',
+    description = 'Random insert and erase benchmark',
+    details = 'some details'
 )
 
 descriptions = dict()
