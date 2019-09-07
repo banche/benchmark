@@ -67,9 +67,12 @@ if __name__ == '__main__':
 
     config = dict()
     if args.config:
-        import importlib
-        cfg = importlib.import_module(args.config.replace('.py', ''))
-        config = cfg.descriptions
+        import types
+        d = types.ModuleType("config")
+        d.__file__ = args.config
+        with open(args.config, mode = "rb") as config_file:
+            exec(config_file.read(), d.__dict__)
+            config = d.descriptions
 
     if args.files:
         benchmarks = load_files(args.files)
