@@ -8,7 +8,7 @@ import sys
 
 import collections
 
-from parser import Benchmark, load_files
+from parser import Benchmark, load_files, parse_benchmark_json
 import html as ht
 
 class PlotTrace(object):
