@@ -67,12 +67,12 @@ Benchmark* add(Benchmark* b);
         YOSHI_PRIVATE_NAME(f) = yoshi::internal::add(               \
         new yoshi::internal::Benchmark(                             \
             #f "<" #__VA_ARGS__ ">",                                \
-            [=](auto& st) { f<__VA_ARGS__>(st);}));
+            [](auto& st) { f<__VA_ARGS__>(st);}));
 
 #define YOSHI_ADD_SHORT_BENCHMARK(f, ...)                           \
     static yoshi::internal::Benchmark*                              \
         YOSHI_PRIVATE_NAME(f) = yoshi::internal::add(               \
             new yoshi::internal::Benchmark(                         \
                 #f "<" #__VA_ARGS__ ">",                            \
-                [=](auto& st) { f<__VA_ARGS__>(st);},               \
+                [](auto& st) { f<__VA_ARGS__>(st);},               \
                 true));
