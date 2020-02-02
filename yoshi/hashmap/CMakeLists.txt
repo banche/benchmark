@@ -37,3 +37,8 @@ yoshi_add_benchmark(hashmap_folly
 yoshi_add_benchmark(hashmap_qt5
     SRC qt5_hash.cpp
     DEPENDS Qt5::Core)
+
+yoshi_add_benchmark(hashmap_tsl
+    SRC tsl_robin_map.cpp
+    DEPENDS tsl::robin_map)
+
