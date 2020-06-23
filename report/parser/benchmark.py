@@ -54,9 +54,15 @@ class Benchmark(object):
 
     def value(self):
         if self.name.find('Rehash') != -1:
-            return self.cpu_time
+            if self.median is None:
+                return self.cpu_time
+            else:
+                return self.median
         else:
-            return self.cpu_time / self.size
+            if self.median is None:
+               return self.cpu_time / self.size
+            else:
+                return self.median / self.size
 
     def legend(self):
         if self.name.contains('Rehash'):
@@ -85,7 +91,7 @@ class Benchmark(object):
         >>> print(b.mean, b.iteration)
         42 10
         """
-        if dct['run_name'] == dct['name']:
+        if dct['run_name'] == dct['name'] and dct['run_type'] != 'iteration':
             b = Benchmark(
                 dct['run_name'],
                 dct['iterations'],
