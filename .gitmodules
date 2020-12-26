@@ -13,3 +13,6 @@
 [submodule "thirdparties/folly"]
 	path = thirdparties/folly
 	url = https://github.com/facebook/folly.git
+[submodule "thirdparties/fmt"]
+	path = thirdparties/fmt
+	url = https://github.com/fmtlib/fmt.git
