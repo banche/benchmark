@@ -31,36 +31,27 @@ class Benchmark(object):
         self.full_name = parse_benchmark_full_name(benchmark_name)
         self.iterations = iterations
         self.real_time = real_time
-        self.cpu_time = cpu_time
+        self.cpu_times = [cpu_time]
         self.unit = unit
         self.run_name = benchmark_name
         self.mean = None
         self.median = None
         self.stddev = None
 
-    def cpu_time(self):
-        if self.median is None:
-            return self.cpu_time
-        else:
-            return self.median
-
-    def stddev(self):
-        return self.stddev
-
     def __str__(self):
         return '{name: %s, params: %s, size_per_iter: %d, iter: %d, real_time: %f, cpu_time: %f, unit: %s}' % \
                 (self.name, str(self.t_params), self.size, self.iterations, self.real_time, \
-                 self.cpu_time, self.unit)
+                 self.cpu_times[0], self.unit)
 
     def value(self):
         if self.name.find('Rehash') != -1:
             if self.median is None:
-                return self.cpu_time
+                return self.cpu_times[0]
             else:
                 return self.median
         else:
             if self.median is None:
-               return self.cpu_time / self.size
+               return self.cpu_times[0] / self.size
             else:
                 return self.median / self.size
 
@@ -114,6 +105,8 @@ class Benchmark(object):
                         dct['time_unit'])
                     Benchmark.__all_benchmarks[b.run_name] = b
                     return b
+                else:
+                    Benchmark.__all_benchmarks[dct['run_name']].cpu_times.append(dct['cpu_time'])
             elif dct['run_type'] == 'aggregate':
                 assert(dct['run_name'] in Benchmark.__all_benchmarks.keys())
                 b = Benchmark.__all_benchmarks[dct['run_name']]
